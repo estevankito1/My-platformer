@@ -2,26 +2,23 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-   
+   //movimiento
     [SerializeField] private float speed = 5f;
+    private float movingInput;
+    private Vector2 movement;
+    [SerializeField] private float jumpForce = 5f;
+
 
     [SerializeField] private SpriteRenderer spriteRenderer;
-
     [SerializeField] private Animator animator;
 
 
     public bool isGrounded = false;
 
+
     private Rigidbody2D rb;
-
-    private float movingInput;
-
-    private Vector2 movement;
-
     private Vector2 screenBounds;
-
     private float playerHalfWidth;
-
     private float xPosLastFrame;
 
 
@@ -39,7 +36,6 @@ public class PlayerMovement : MonoBehaviour
         ClampMovement();
         FlipCharacterX();
 
-        Debug.Log(movingInput);
     }
 
     private void FlipCharacterX() 
