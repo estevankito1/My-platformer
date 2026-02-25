@@ -3,18 +3,27 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
    //movimiento
+    [Header("Move info")]
     [SerializeField] private float speed = 5f;
     private float movingInput;
     private Vector2 movement;
-    [SerializeField] private float jumpForce = 5f;
+    
+
 
 
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private Animator animator;
+    [SerializeField] private float jumpForce = 6f;
 
 
-    public bool isGrounded = false;
+    
 
+    [Header("Ground Check")]
+    public Transform groundCheck;
+    private bool isGrounded = false;
+    public LayerMask GroundLayer;
+
+    public float groundCheckRadius = 0.2f;
 
     private Rigidbody2D rb;
     private Vector2 screenBounds;
@@ -37,6 +46,8 @@ public class PlayerMovement : MonoBehaviour
         FlipCharacterX();
 
     }
+
+    
 
     private void FlipCharacterX() 
     {
@@ -76,4 +87,10 @@ public class PlayerMovement : MonoBehaviour
             animator.SetBool("isRunning", false);
         }
     }
+
+   
+
+
+
+
 }
