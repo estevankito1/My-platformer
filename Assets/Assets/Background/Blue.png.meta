@@ -1,12 +1,5 @@
 fileFormatVersion: 2
-guid: 8049ea91a9d5fca4dab4024c0915dbe6
-AssetOrigin:
-  serializedVersion: 1
-  productId: 155360
-  packageName: Pixel Adventure 1
-  packageVersion: 1.0
-  assetPath: Assets/Pixel Adventure 1/Assets/Background/Blue.png
-  uploadId: 332803
+guid: 3bc1d49bc9098904c90232c21d05b912
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}

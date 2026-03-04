@@ -1,12 +1,5 @@
 fileFormatVersion: 2
-guid: ffc80c129c9aca14c9fb4dbeba0e10d2
-AssetOrigin:
-  serializedVersion: 1
-  productId: 155360
-  packageName: Pixel Adventure 1
-  packageVersion: 1.0
-  assetPath: Assets/Pixel Adventure 1/Assets/Background/Gray.png
-  uploadId: 332803
+guid: 7406961d15cbaa94d85eaf4b99461c3c
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}

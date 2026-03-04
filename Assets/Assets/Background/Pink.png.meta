@@ -1,12 +1,5 @@
 fileFormatVersion: 2
-guid: 348c3b734b11d3b4aa5c69e25b7113e6
-AssetOrigin:
-  serializedVersion: 1
-  productId: 155360
-  packageName: Pixel Adventure 1
-  packageVersion: 1.0
-  assetPath: Assets/Pixel Adventure 1/Assets/Background/Pink.png
-  uploadId: 332803
+guid: a62256c479568874cab869f9d9119e8a
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}

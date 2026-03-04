@@ -1,12 +1,5 @@
 fileFormatVersion: 2
-guid: c67ce4f5bcebc8943a10698b6614f86f
-AssetOrigin:
-  serializedVersion: 1
-  productId: 155360
-  packageName: Pixel Adventure 1
-  packageVersion: 1.0
-  assetPath: Assets/Pixel Adventure 1/Assets/Traps/Saw/Chain.png
-  uploadId: 332803
+guid: 06f664d9856d4be468942beb0943ff15
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}

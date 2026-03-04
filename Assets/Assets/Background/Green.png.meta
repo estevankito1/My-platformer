@@ -1,12 +1,5 @@
 fileFormatVersion: 2
-guid: 2538710101d0f1f4e8976b3495cd1f75
-AssetOrigin:
-  serializedVersion: 1
-  productId: 155360
-  packageName: Pixel Adventure 1
-  packageVersion: 1.0
-  assetPath: Assets/Pixel Adventure 1/Assets/Background/Green.png
-  uploadId: 332803
+guid: 82ae0830155ca7448a15dc27fa9b723b
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}

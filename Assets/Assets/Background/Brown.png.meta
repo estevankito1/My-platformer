@@ -1,12 +1,5 @@
 fileFormatVersion: 2
-guid: ca6a66f8e2ae9c24c8c6b39c49206a0d
-AssetOrigin:
-  serializedVersion: 1
-  productId: 155360
-  packageName: Pixel Adventure 1
-  packageVersion: 1.0
-  assetPath: Assets/Pixel Adventure 1/Assets/Background/Brown.png
-  uploadId: 332803
+guid: 27710bb522a936f45b448eaf9eb61dd4
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
