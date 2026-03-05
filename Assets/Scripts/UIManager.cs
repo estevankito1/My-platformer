@@ -1,48 +1,47 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using TMPro;
 
 public class UIManager : MonoBehaviour
 {
     public static UIManager Instance;
 
     [Header("Salud")]
-    public Slider healthBar;
-    public float hideDelay = 2f;      // segundos hasta que se oculta
+    [SerializeField] private Slider healthBar;
+    [SerializeField] private float hideDelay = 2.5f;
     private Coroutine hideCoroutine;
+
+    [Header("Vidas")]
+    [SerializeField] private TextMeshProUGUI livesText;
 
     // -------------------------------------------------------
     void Awake()
     {
         if (Instance == null) Instance = this;
-        else Destroy(gameObject);
-    }
+        else { Destroy(gameObject); return; }
 
-    void Start()
-    {
-        // Oculto al inicio
+        // Ocultar barra al inicio
         if (healthBar != null)
             healthBar.gameObject.SetActive(false);
     }
 
+    // -------------------------------------------------------
+    // BARRA DE SALUD
     // -------------------------------------------------------
     public void UpdateHealthBar(float current, float max)
     {
         if (healthBar == null) return;
 
         healthBar.value = current / max;
-
-        // Mostrar el slider
         healthBar.gameObject.SetActive(true);
 
-        // Reiniciar el temporizador de ocultamiento
-        if (hideCoroutine != null)
-            StopCoroutine(hideCoroutine);
-
-        hideCoroutine = StartCoroutine(HideAfterDelay());
+        // Reiniciar temporizador de ocultamiento
+        if (hideCoroutine != null) StopCoroutine(hideCoroutine);
+        hideCoroutine = StartCoroutine(HideHealthBar());
     }
 
-    IEnumerator HideAfterDelay()
+    IEnumerator HideHealthBar()
     {
         yield return new WaitForSeconds(hideDelay);
         if (healthBar != null)
@@ -50,8 +49,11 @@ public class UIManager : MonoBehaviour
     }
 
     // -------------------------------------------------------
-    public void UpdateLives(int lives)
+    // VIDAS
+    // -------------------------------------------------------
+    public void UpdateLives(int current, int max)
     {
-        // Sin UI de vidas, el GameManager las sigue contando internamente
+        if (livesText != null)
+            livesText.text = $"Vidas: {current}";
     }
 }

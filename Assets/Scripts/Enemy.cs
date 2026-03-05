@@ -1,44 +1,43 @@
 using UnityEngine;
+using System.Collections;
 
 public class Enemy : MonoBehaviour
 {
-    public enum EnemyState { Patrol, Chase, Attack }
+    public enum EnemyState { Patrol, Chase, Attack, Dead }
     private EnemyState currentState = EnemyState.Patrol;
 
     // -------------------------------------------------------
     // SALUD
     // -------------------------------------------------------
-    [Header("Health")]
-    public float maxHealth = 50f;
+    [Header("Salud")]
+    [SerializeField] private float maxHealth = 50f;
     private float currentHealth;
 
     // -------------------------------------------------------
     // DETECCIÓN
     // -------------------------------------------------------
     [Header("Detección")]
-    public float detectionRange = 5f;
-    public float attackRange = 1.2f;
-    public LayerMask playerLayer;
+    [SerializeField] private float detectionRange = 5f;
+    [SerializeField] private float attackRange = 1.2f;
+    [SerializeField] private LayerMask playerLayer;
 
     // -------------------------------------------------------
     // MOVIMIENTO
     // -------------------------------------------------------
     [Header("Movimiento")]
-    public float patrolSpeed = 2f;
-    public float chaseSpeed = 4f;
-    public float patrolDistance = 3f;
-    public LayerMask groundLayer;
+    [SerializeField] private float patrolSpeed = 2f;
+    [SerializeField] private float chaseSpeed = 4f;
+    [SerializeField] private float patrolDistance = 3f;
+    [SerializeField] private LayerMask groundLayer;
 
     // -------------------------------------------------------
     // ATAQUE
     // -------------------------------------------------------
     [Header("Ataque")]
-    public float attackDamage = 10f;
-    public float attackCooldown = 1f;
-
-    [Header("Knockback al player")]
-    public bool applyKnockback = true;
-    public float knockbackForce = 5f;
+    [SerializeField] private float attackDamage = 15f;
+    [SerializeField] private float attackCooldown = 1.2f;
+    [SerializeField] private float knockbackForce = 5f;
+    private float lastAttackTime;
 
     // -------------------------------------------------------
     // REFERENCIAS
@@ -48,9 +47,6 @@ public class Enemy : MonoBehaviour
 
     private Rigidbody2D rb;
     private Transform player;
-    private float lastAttackTime;
-
-    // Patrulla
     private Vector2 startPosition;
     private float patrolDirection = 1f;
 
@@ -61,7 +57,6 @@ public class Enemy : MonoBehaviour
         startPosition = transform.position;
         currentHealth = maxHealth;
 
-        // Buscar player por tag
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null)
             player = playerObj.transform;
@@ -72,11 +67,10 @@ public class Enemy : MonoBehaviour
     // -------------------------------------------------------
     void Update()
     {
-        if (player == null) return;
+        if (currentState == EnemyState.Dead || player == null) return;
 
         float dist = Vector2.Distance(transform.position, player.position);
 
-        // Máquina de estados
         if (dist <= attackRange)
             currentState = EnemyState.Attack;
         else if (dist <= detectionRange)
@@ -91,7 +85,7 @@ public class Enemy : MonoBehaviour
             case EnemyState.Attack: DoAttack(); break;
         }
 
-        HandleAnimations();
+        UpdateAnimations();
     }
 
     // -------------------------------------------------------
@@ -99,23 +93,18 @@ public class Enemy : MonoBehaviour
     // -------------------------------------------------------
     void DoPatrol()
     {
-        // Mover horizontalmente
         rb.linearVelocity = new Vector2(patrolSpeed * patrolDirection, rb.linearVelocity.y);
 
-        // Girar al llegar al límite de patrulla
         float distFromStart = transform.position.x - startPosition.x;
-        if (distFromStart >= patrolDistance)
-            patrolDirection = -1f;
-        else if (distFromStart <= -patrolDistance)
-            patrolDirection = 1f;
+        if (distFromStart >= patrolDistance) patrolDirection = -1f;
+        else if (distFromStart <= -patrolDistance) patrolDirection = 1f;
 
-        // Evitar caer de plataformas
+        // Detectar borde de plataforma
         if (groundLayer != 0)
         {
             Vector2 edgeCheck = new Vector2(
                 transform.position.x + patrolDirection * 0.6f,
                 transform.position.y - 1f);
-
             if (!Physics2D.OverlapCircle(edgeCheck, 0.1f, groundLayer))
                 patrolDirection *= -1f;
         }
@@ -128,9 +117,9 @@ public class Enemy : MonoBehaviour
     // -------------------------------------------------------
     void DoChase()
     {
-        float direction = Mathf.Sign(player.position.x - transform.position.x);
-        rb.linearVelocity = new Vector2(chaseSpeed * direction, rb.linearVelocity.y);
-        Flip(direction);
+        float dir = Mathf.Sign(player.position.x - transform.position.x);
+        rb.linearVelocity = new Vector2(chaseSpeed * dir, rb.linearVelocity.y);
+        Flip(dir);
     }
 
     // -------------------------------------------------------
@@ -138,7 +127,7 @@ public class Enemy : MonoBehaviour
     // -------------------------------------------------------
     void DoAttack()
     {
-        rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+        rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
 
         if (Time.time >= lastAttackTime + attackCooldown)
         {
@@ -148,52 +137,46 @@ public class Enemy : MonoBehaviour
             Collider2D hit = Physics2D.OverlapCircle(transform.position, attackRange, playerLayer);
             if (hit != null)
             {
-                hit.GetComponent<PlayerMovement>()?.TakeDamage(attackDamage);
-
-                if (applyKnockback)
-                {
-                    Rigidbody2D playerRb = hit.GetComponent<Rigidbody2D>();
-                    if (playerRb != null)
-                    {
-                        Vector2 knockDir = (hit.transform.position - transform.position).normalized;
-                        playerRb.AddForce(knockDir * knockbackForce, ForceMode2D.Impulse);
-                    }
-                }
+                // Pasar posición del enemigo para knockback
+                hit.GetComponent<PlayerMovement>()?.TakeDamage(attackDamage, transform.position);
             }
         }
     }
 
     // -------------------------------------------------------
-    // RECIBIR DAÑO (llamado desde PlayerMovement.DoAttack)
+    // RECIBIR DAÑO
     // -------------------------------------------------------
     public void TakeDamage(float amount)
     {
-        currentHealth -= amount;
+        if (currentState == EnemyState.Dead) return;
 
+        currentHealth = Mathf.Max(currentHealth - amount, 0f);
         animator?.SetTrigger("hurt");
 
         if (currentHealth <= 0f)
-            Die();
+            StartCoroutine(Die());
     }
 
-    private void Die()
+    IEnumerator Die()
     {
-        animator?.SetTrigger("die");
-        // Desactivar colisión y movimiento al morir
-        GetComponent<Collider2D>().enabled = false;
+        currentState = EnemyState.Dead;
         rb.linearVelocity = Vector2.zero;
-        this.enabled = false;
-        // Destruir tras un momento para que la animación termine
-        Destroy(gameObject, 0.5f);
+        rb.bodyType = RigidbodyType2D.Kinematic;
+        GetComponent<Collider2D>().enabled = false;
+
+        animator?.SetTrigger("die");
+
+        yield return new WaitForSeconds(0.8f);
+        Destroy(gameObject);
     }
 
     // -------------------------------------------------------
     // ANIMACIONES
     // -------------------------------------------------------
-    void HandleAnimations()
+    void UpdateAnimations()
     {
         if (animator == null) return;
-        animator.SetBool("isRunning", currentState == EnemyState.Patrol || currentState == EnemyState.Chase);
+        animator.SetBool("isRunning", currentState != EnemyState.Attack);
         animator.SetBool("isChasing", currentState == EnemyState.Chase);
     }
 

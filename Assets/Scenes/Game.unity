@@ -494,24 +494,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 5
   jumpForce: 10
+  fallMultiplier: 2.5
+  lowJumpMultiplier: 1.5
   groundCheck: {fileID: 245141354}
   groundCheckSize: {x: 1.18, y: 0.69}
-  GroundLayer:
+  groundLayer:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 0
+  dashForce: 20
+  dashDuration: 0.2
+  dashCooldown: 1
+  dashTrail: {fileID: 0}
   attackDamage: 25
   attackCooldown: 0.5
   attackRange: 1.2
   attackPoint: {fileID: 371360382}
   enemyLayer:
     serializedVersion: 2
-    m_Bits: 256
-  dashForce: 20
-  dashDuration: 0.2
-  dashCooldown: 1
-  dashTrail: {fileID: 0}
+    m_Bits: 0
   maxHealth: 100
   invincibleTime: 1.5
+  knockbackForce: 6
   spriteRenderer: {fileID: 374406893}
   animator: {fileID: 374406897}
 --- !u!95 &374406897
@@ -680,7 +683,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: ca5ce7f3f3ac3bb499d37119b1867d7e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f805dad0b8874bc429b30c0595cf3f8b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -717,9 +720,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d39e13d5e53586647a497ef8003e6841, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Saw
-  sawType: 2
+  sawType: 1
   rotationSpeed: 300
-  moveDistance: 2
+  moveDistance: 5
   moveSpeed: 2
   pendulumAngle: 45
   pendulumSpeed: 1
@@ -727,7 +730,6 @@ MonoBehaviour:
   damage: 999
   killInstantly: 1
   chain: {fileID: 0}
-  hitParticles: {fileID: 0}
 --- !u!58 &490899124
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -1372,6 +1374,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UIManager
   healthBar: {fileID: 1287636835}
   hideDelay: 5
+  livesText: {fileID: 0}
 --- !u!114 &1226503117
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1385,11 +1388,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   maxLives: 3
-  GameOverScene: GameOver
-  mainMenuScene: MainMenu
-  gameScene: Game
   respawnPoint: {fileID: 1396886396}
   respawnDelay: 2
+  gameOverScene: GameOver
+  mainMenuScene: MainMenu
+  gameScene: Game
 --- !u!1 &1236652099
 GameObject:
   m_ObjectHideFlags: 0
@@ -1511,7 +1514,6 @@ MonoBehaviour:
     m_Bits: 8
   attackDamage: 100
   attackCooldown: 1
-  applyKnockback: 1
   knockbackForce: 5
   animator: {fileID: 1236652105}
 --- !u!70 &1236652103

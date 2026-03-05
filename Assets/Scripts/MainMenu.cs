@@ -1,18 +1,25 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour
 {
-    public void PlayGame()
+    [SerializeField] private Button playButton;
+    [SerializeField] private Button quitButton;
+    [SerializeField] private string gameScene = "Game";
+
+    void Start()
     {
-        SceneManager.LoadScene("Game");
+        playButton?.onClick.AddListener(PlayGame);
+        quitButton?.onClick.AddListener(QuitGame);
     }
 
-    public void QuitGame()
-    {
-        Application.Quit();
-    }
+    void PlayGame() => SceneManager.LoadScene(gameScene);
+    void QuitGame() => Application.Quit();
 }
+
+
+
 
 
 

@@ -1,49 +1,35 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 using System.Collections;
 
+// -------------------------------------------------------
+// PANTALLA DE GAME OVER
+// -------------------------------------------------------
 public class GameOverScreen : MonoBehaviour
 {
-    [Header("Botones")]
-    public Button retryButton;
-    public Button mainMenuButton;
+    [SerializeField] private Button retryButton;
+    [SerializeField] private Button mainMenuButton;
+    [SerializeField] private CanvasGroup canvasGroup;
 
     void Start()
     {
-        retryButton.onClick.AddListener(OnRetry);
-        mainMenuButton.onClick.AddListener(OnMainMenu);
+        retryButton?.onClick.AddListener(() => GameManager.Instance?.RestartGame());
+        mainMenuButton?.onClick.AddListener(() => GameManager.Instance?.GoToMainMenu());
         StartCoroutine(FadeIn());
-    }
-
-    void OnRetry()
-    {
-        if (GameManager.Instance != null)
-            GameManager.Instance.RestartGame();
-        else
-            SceneManager.LoadScene("Game");
-    }
-
-    void OnMainMenu()
-    {
-        if (GameManager.Instance != null)
-            GameManager.Instance.GoToMainMenu();
-        else
-            SceneManager.LoadScene("MainMenu");
     }
 
     IEnumerator FadeIn()
     {
-        CanvasGroup cg = GetComponent<CanvasGroup>();
-        if (cg == null) yield break;
-
-        cg.alpha = 0f;
+        if (canvasGroup == null) yield break;
+        canvasGroup.alpha = 0f;
         float t = 0f;
         while (t < 1f)
         {
-            t += Time.deltaTime;
-            cg.alpha = t;
+            t += Time.deltaTime * 1.5f;
+            canvasGroup.alpha = Mathf.Clamp01(t);
             yield return null;
         }
     }
 }
+
+

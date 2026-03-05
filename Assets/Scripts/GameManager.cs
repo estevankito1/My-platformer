@@ -7,17 +7,17 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     [Header("Vidas")]
-    public int maxLives = 3;
+    [SerializeField] private int maxLives = 3;
     private int currentLives;
 
-    [Header("Escenas")]
-    public string GameOverScene = "GameOver";
-    public string mainMenuScene = "MainMenu";
-    public string gameScene = "Game";
-
     [Header("Respawn")]
-    public Transform respawnPoint;
-    public float respawnDelay = 2f;
+    [SerializeField] private Transform respawnPoint;
+    [SerializeField] private float respawnDelay = 1.5f;
+
+    [Header("Escenas")]
+    [SerializeField] private string gameOverScene = "GameOver";
+    [SerializeField] private string mainMenuScene = "MainMenu";
+    [SerializeField] private string gameScene = "Game";
 
     private GameObject player;
 
@@ -27,7 +27,7 @@ public class GameManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // persiste entre escenas
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -41,44 +41,43 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
-        UIManager.Instance?.UpdateLives(currentLives);
+        UIManager.Instance?.UpdateLives(currentLives, maxLives);
     }
 
     // -------------------------------------------------------
-    // Llamado desde PlayerMovement cuando el jugador muere
+    // PLAYER MURIÓ
     // -------------------------------------------------------
     public void PlayerDied()
     {
         currentLives--;
-        UIManager.Instance?.UpdateLives(currentLives);
+        UIManager.Instance?.UpdateLives(currentLives, maxLives);
 
         if (currentLives <= 0)
-        {
-            Instance = null;
-            SceneManager.LoadScene(GameOverScene);
-        }
+            StartCoroutine(LoadGameOver());
         else
-        {
-            StartCoroutine(Respawn());
-        }
+            StartCoroutine(RespawnPlayer());
     }
 
-    IEnumerator Respawn()
+    IEnumerator RespawnPlayer()
     {
-        if (player != null) player.SetActive(false);
-
         yield return new WaitForSeconds(respawnDelay);
 
         if (player != null && respawnPoint != null)
         {
             player.transform.position = respawnPoint.position;
-            player.SetActive(true);
             player.GetComponent<PlayerMovement>()?.ResetHealth();
+            player.SetActive(true);
         }
     }
 
+    IEnumerator LoadGameOver()
+    {
+        yield return new WaitForSeconds(1f);
+        SceneManager.LoadScene(gameOverScene);
+    }
+
     // -------------------------------------------------------
-    // Botones del Game Over
+    // PÚBLICOS
     // -------------------------------------------------------
     public void RestartGame()
     {
@@ -88,9 +87,10 @@ public class GameManager : MonoBehaviour
 
     public void GoToMainMenu()
     {
-        Destroy(gameObject);
         SceneManager.LoadScene(mainMenuScene);
     }
 
     public int GetLives() => currentLives;
 }
+
+
