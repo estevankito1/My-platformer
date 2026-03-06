@@ -4,6 +4,8 @@ using System.Collections;
 public class Enemy : MonoBehaviour
 {
     public enum EnemyState { Patrol, Chase, Attack, Dead }
+
+    [SerializeField]
     private EnemyState currentState = EnemyState.Patrol;
 
     // -------------------------------------------------------
@@ -47,22 +49,44 @@ public class Enemy : MonoBehaviour
 
     private Rigidbody2D rb;
     private Transform player;
-    private Vector2 startPosition;
-    private float patrolDirection = 1f;
+
+	[SerializeField]
+	private Vector2 startPosition;
+
+    [SerializeField]
+    private Transform[] patrolPoints;
+
+    [SerializeField]
+    private Transform currentPoint, edgeDetectionPoint;
+
+    [SerializeField]
+    private float edgeDetectionRange = 0.1f;
+
+    [SerializeField]
+    private float patrolStopDistance;
+
+	[SerializeField]
+    private int patrolPointIndex;
+
+	private float patrolDirection = 1f;
 
     // -------------------------------------------------------
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         startPosition = transform.position;
-        currentHealth = maxHealth;
+        patrolPointIndex = patrolPoints.Length - 1;
+		currentPoint = patrolPoints[patrolPointIndex];
+		currentHealth = maxHealth;
 
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null)
             player = playerObj.transform;
         else
             Debug.LogWarning("Enemy: No encontró un GameObject con tag 'Player'");
-    }
+
+
+	}
 
     // -------------------------------------------------------
     void Update()
@@ -91,23 +115,43 @@ public class Enemy : MonoBehaviour
     // -------------------------------------------------------
     // PATRULLA
     // -------------------------------------------------------
+
+
+    void UpdatePatrolPoint()
+    {
+		patrolPointIndex++;
+
+		if (patrolPointIndex >= patrolPoints.Length)
+		{
+			patrolPointIndex = 0;
+		}
+
+		currentPoint = patrolPoints[patrolPointIndex];
+		patrolDirection *= -1;
+	}
+
     void DoPatrol()
     {
         rb.linearVelocity = new Vector2(patrolSpeed * patrolDirection, rb.linearVelocity.y);
 
-        float distFromStart = transform.position.x - startPosition.x;
-        if (distFromStart >= patrolDistance) patrolDirection = -1f;
-        else if (distFromStart <= -patrolDistance) patrolDirection = 1f;
+        //Calcular la distancia al punto actual
+        float distanceToDestination = Vector2.Distance(transform.position, currentPoint.position);
 
-        // Detectar borde de plataforma
-        if (groundLayer != 0)
+		//Si la distancia es menor o igual a la patrolStopDistance, actualizamos el punto de patrullaje, de preferenica que la patrolStopDistance mo sea cero.
+		if (distanceToDestination <= patrolStopDistance) 
         {
-            Vector2 edgeCheck = new Vector2(
-                transform.position.x + patrolDirection * 0.6f,
-                transform.position.y - 1f);
-            if (!Physics2D.OverlapCircle(edgeCheck, 0.1f, groundLayer))
-                patrolDirection *= -1f;
-        }
+            UpdatePatrolPoint();
+		}
+
+
+		Debug.Log($"patrolDirection is: {patrolDirection}");
+
+		// Detectar borde de plataforma con un raycast, si no golpea nada es que no tiene piso y volteamos al enemigo
+		if(!Physics2D.Raycast(edgeDetectionPoint.position, Vector3.down, edgeDetectionRange, groundLayer))
+        {
+			UpdatePatrolPoint();
+		}
+        Debug.DrawRay(edgeDetectionPoint.position, Vector3.down * edgeDetectionRange, Color.red);
 
         Flip(patrolDirection);
     }
@@ -198,7 +242,7 @@ public class Enemy : MonoBehaviour
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, detectionRange);
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, attackRange);
-    }
+		Gizmos.color = Color.red;
+		Gizmos.DrawWireSphere(transform.position, attackRange);
+	}
 }
