@@ -15,9 +15,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float respawnDelay = 1.5f;
 
     [Header("Escenas")]
-    [SerializeField] private string gameOverScene = "GameOver";
-    [SerializeField] private string mainMenuScene = "MainMenu";
-    [SerializeField] private string gameScene = "Game";
+    [SerializeField] private string gameOverScene = "1";
+    [SerializeField] private string mainMenuScene = "2";
+    [SerializeField] private string gameScene = "0";
 
     private GameObject player;
 
@@ -73,7 +73,7 @@ public class GameManager : MonoBehaviour
     IEnumerator LoadGameOver()
     {
         yield return new WaitForSeconds(1f);
-        SceneManager.LoadScene(gameOverScene);
+        SceneManager.LoadScene(1);
     }
 
     // -------------------------------------------------------
@@ -82,12 +82,12 @@ public class GameManager : MonoBehaviour
     public void RestartGame()
     {
         currentLives = maxLives;
-        SceneManager.LoadScene(gameScene);
+        SceneManager.LoadScene(1);
     }
 
     public void GoToMainMenu()
     {
-        SceneManager.LoadScene(mainMenuScene);
+        SceneManager.LoadScene(2);
     }
 
     public int GetLives() => currentLives;
