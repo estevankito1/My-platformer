@@ -275,6 +275,7 @@ public class Enemy : MonoBehaviour
 
         animator?.SetTrigger("die");
         spawner?.OnEnemyDied();
+        spawner?.StartSpawnCheck();
 
         yield return new WaitForSeconds(0.8f);
         Destroy(gameObject);

@@ -8,7 +8,7 @@ public class EnemySpawner : MonoBehaviour
     // CONFIGURACIÓN
     // -------------------------------------------------------
     [Header("Spawning")]
-    [SerializeField] private GameObject enemyPrefab;
+    [SerializeField] private GameObject enemyPrefab; //Referenciar un PREFAB no objeto de escena
     [SerializeField] private int maxEnemies = 4;
     [SerializeField] private float spawnInterval = 4f;
 
@@ -25,8 +25,9 @@ public class EnemySpawner : MonoBehaviour
 
     private Transform player;
 
-    // Lista de enemigos vivos — más confiable que un contador
-    private List<GameObject> activeEnemies = new List<GameObject>();
+	// Lista de enemigos vivos — más confiable que un contador
+	[SerializeField]
+	private List<GameObject> activeEnemies = new List<GameObject>();
 
     // -------------------------------------------------------
     void Start()
@@ -35,8 +36,8 @@ public class EnemySpawner : MonoBehaviour
         if (player == null)
             Debug.LogWarning("EnemySpawner: No encontró al Player");
 
-        StartCoroutine(SpawnLoop());
-    }
+        StartSpawnCheck();
+	}
 
     // -------------------------------------------------------
     void Update()
@@ -54,7 +55,7 @@ public class EnemySpawner : MonoBehaviour
         // Esperar un momento antes del primer spawn
         yield return new WaitForSeconds(2f);
 
-        while (true)
+        while (activeEnemies.Count < maxEnemies) // cocdicionar a que solo se haga el spawn si la cuenta de la lista de enemigos es menor a los maxEnemies
         {
             // Limpiar nulos antes de contar
             activeEnemies.RemoveAll(e => e == null);
@@ -66,6 +67,11 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
+    public void StartSpawnCheck() //Lamar esta función cuando un enemigo muera para revisar si se pueden spawnear nuevos
+    {
+		StartCoroutine(SpawnLoop());
+	}
+
     // -------------------------------------------------------
     void TrySpawn()
     {
@@ -76,6 +82,9 @@ public class EnemySpawner : MonoBehaviour
             Vector2 candidate = (Vector2)player.position + Vector2.right * side * dist;
 
             RaycastHit2D hit = Physics2D.Raycast(candidate, Vector2.down, groundCheckDistance, groundLayer);
+
+            Debug.DrawRay(candidate, Vector2.down* groundCheckDistance, Color.red, 3);
+
             if (hit.collider != null)
             {
                 // Spawnear encima del suelo con suficiente espacio
@@ -116,5 +125,5 @@ public class EnemySpawner : MonoBehaviour
         Gizmos.DrawWireSphere(player.position, minSpawnDistance);
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(player.position, maxSpawnDistance);
-    }
+	}
 }
